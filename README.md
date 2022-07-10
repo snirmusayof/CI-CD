@@ -14,3 +14,7 @@ Then, add the variables for the CI/CD:
 
 `Settings -> CI/CD -> General Pipelines -> Variables`
 
+| Variable     | Example      | Description  |
+| :------------ |   :---:       | --------: |
+| `APP`        | tester         |Applictaion name   |
+| `HELM_GIT_PATH`| cloudlet/helm/tester         | Helm chart git path   |
