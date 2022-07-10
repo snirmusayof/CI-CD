@@ -1,0 +1,10 @@
+build:
+  environment:
+    name: $ENV
+  image: $REGISTRY_URL/helm-oc:2.14.1
+  stage: build
+  script:
+    - echo "THE CURRENT ENVIRONMENT IS:" $env
+    - oc login $OPENSHIFT_HOST --token$OPENSHIFT_TOKEN -- inscure-skip-tls-verift -n $OPENSHIFT_PROJECT
+    - |
+      wget --header="PRIVATE_TOKEN: ${GITLAB_API_TOKEN}" -O build-template.yaml http://github/api/v4/projects/4546/repositort/files
