@@ -1,0 +1,29 @@
+variables:
+    REGISTRY_URL: github.com
+    IMAGE: $REGISTRY_URL/$OPENSHIFT_PROJECT/$APP:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHA
+    OPENSHIFT_PROJECT: cloudlet
+    BUILD_NAME: $APP:$CI_COMMIT_REF_NAME-commit
+    ENV: staging
+
+workflow:
+    rules:
+      - if: $CI_COMMIT_TAG
+        variables:
+          ENV: prod
+      - if: '$CI_COMMIT_TAG == null'
+        variables:
+          ENV: staging
+
+include:
+- '/common-jobs/sonarqube.yaml
+- '/common-jobs/build-image.yaml
+- '/common-jobs/update-helm.yaml
+- '/python/tests.yaml
+- '/python/lint.yaml
+
+stages:
+- test
+- sonarqube
+- lint
+- build
+- update-helm
