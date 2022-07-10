@@ -1,0 +1,29 @@
+update-helm:
+  stage: update-helm
+  image: $REGISTRY_URL/cloudlet/centos/centos7-helm3:0.1
+  
+rules:
+  - if '$ENV == "prod"'
+    when: on_success
+    variables:
+      VALUES_FILE: "values.yaml"
+       
+  - if '$ENV == "staging"'
+    when: always
+    variables:
+      VALUES_FILE: "values.prep.yaml"
+      
+environment:
+  name: $ENV
+befor_script:
+  - git config --global user.email "$GIT_USERNAME@github.com"
+  - git config --global user.user "$GIT_USERNAME"
+script:
+- mkdir chart
+- cd chart
+- git clone http://$GIT_USERNAME:GIT_PASSWORD@GIT_FQDN/$HELM_GIT_PATH.git
+- cd *
+- "sed -i 's/tag: .*/tag:  \"'$CI_COMMIT_REF_NAME-$CI_COMMIT_SHA'\"/' $VALUES_FILE"
+- git add -A
+- git commit -m "Change image tag to $CI_COMMIT_REF_NAME-$CI_COMMIT_SHA in $VALUES_FILE" || true
+- git push || true
