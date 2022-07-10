@@ -7,4 +7,13 @@ build:
     - echo "THE CURRENT ENVIRONMENT IS:" $env
     - oc login $OPENSHIFT_HOST --token$OPENSHIFT_TOKEN -- inscure-skip-tls-verift -n $OPENSHIFT_PROJECT
     - |
-      wget --header="PRIVATE_TOKEN: ${GITLAB_API_TOKEN}" -O build-template.yaml http://github/api/v4/projects/4546/repositort/files
+      wget --header="PRIVATE_TOKEN: ${GITLAB_API_TOKEN}" -O build-template.yaml http://github/api/v4/projects/4546/repositort/files/applications%2Fbuild-template.yaml/raw?ref=master
+    - oc process -f build-template.yaml -p NAME=$BUILD_NAME -p IMAGE=$IMAGE > bc
+    - oc apply -f bc
+    - oc start-build $BUILD_NAME --from-dir=. --wait --follow
+      
+  rules:
+    - if '$ENV == "prod"'
+      when: on_success
+    - if '$ENV == "staging"'
+      when: always 
