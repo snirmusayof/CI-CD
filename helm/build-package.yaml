@@ -1,0 +1,22 @@
+stage:
+  - build
+  
+staging:
+  image: $REGISTRY_URL/cloudlet/centos/centos7-helm3:0.1
+  stage: build
+  before_script:
+    - export HELM_EXPERIMENTAL_OCI=1
+    - helm registry login $REGISTRY/$PROJECT -u $HARBOR_USERNAME -p $HARBOR_PASSWORD
+  script:
+    - helm package ./
+    - CHART_NAME= `cat Chart.yaml | grep name | awk '{print $2}
+    - CHART_VERSION= `cat Chart.yaml | grep version | awk '{print $2}
+    - PUSH_NAME="$CHART_NAME-$CHART_VERSION.tgz"
+    - echo $PUSH_NAME
+    - ls ./
+    - helm push $PUSH_NAME oci://$REGISTRY/$REPO_NAME
+  only:
+    refs:
+      - master
+    changes:
+      - Chart.yaml
