@@ -1,6 +1,0 @@
-test-python:
-  stage: test
-  image: $REGISTRY_URL/cloudlet/pytest-mypy:python-36
-  script:
-    - pytest .
-  allow_failure: true
